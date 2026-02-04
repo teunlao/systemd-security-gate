@@ -1,0 +1,58 @@
+name: systemd-security-gate
+description: "Fail CI when systemd service hardening regresses (systemd-analyze security, offline)"
+author: "TBD"
+
+inputs:
+  paths:
+    description: "Newline-separated globs to find .service files"
+    required: true
+  exclude:
+    description: "Newline-separated globs to exclude"
+    required: false
+    default: ""
+  threshold:
+    description: "Fail if overall exposure is greater than this value"
+    required: true
+  policy:
+    description: "Path to systemd-analyze security policy JSON"
+    required: false
+    default: ""
+  allowlist:
+    description: "Path to allowlist JSON"
+    required: false
+    default: ""
+  mode:
+    description: "enforce|report"
+    required: false
+    default: "enforce"
+  json_report:
+    description: "Write combined JSON report to this path"
+    required: false
+    default: ""
+  sarif_report:
+    description: "Write SARIF report to this path"
+    required: false
+    default: ""
+
+runs:
+  using: docker
+  image: Dockerfile
+  args:
+    - scan
+    - --paths
+    - ${{ inputs.paths }}
+    - --exclude
+    - ${{ inputs.exclude }}
+    - --threshold
+    - ${{ inputs.threshold }}
+    - --policy
+    - ${{ inputs.policy }}
+    - --allowlist
+    - ${{ inputs.allowlist }}
+    - --mode
+    - ${{ inputs.mode }}
+    - --json-report
+    - ${{ inputs.json_report }}
+    - --sarif-report
+    - ${{ inputs.sarif_report }}
+
