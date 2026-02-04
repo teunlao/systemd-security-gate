@@ -41,6 +41,21 @@ func TestServiceUnitsExclude(t *testing.T) {
 	}
 }
 
+func TestServiceUnitsNormalizesPatterns(t *testing.T) {
+	repo := t.TempDir()
+	mustWrite(t, filepath.Join(repo, "deploy/systemd/a.service"), "[Service]\n")
+	mustWrite(t, filepath.Join(repo, "deploy/systemd/b.service"), "[Service]\n")
+
+	got, err := ServiceUnits(repo, []string{"./deploy/systemd/*.service"}, []string{"./deploy/systemd/b.service"})
+	if err != nil {
+		t.Fatalf("ServiceUnits() error = %v", err)
+	}
+	want := []string{"deploy/systemd/a.service"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("ServiceUnits() = %#v, want %#v", got, want)
+	}
+}
+
 func mustWrite(t *testing.T, path string, content string) {
 	t.Helper()
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
