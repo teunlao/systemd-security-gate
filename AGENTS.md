@@ -183,7 +183,7 @@ CI считается проваленным, если:
 - allowlist по **unit path** + **test identifier** (например `PrivateNetwork`, `ProtectSystem`, …)
 - режимы:
   - `allowlist-only`: допускаем только перечисленные исключения
-  - `report`: просто репортим, без фейла (для первичного внедрения)
+  - `report`: не валим сборку по threshold (для первичного внедрения), но ошибки анализа (missing tool/parse errors) всё равно считаем фейлом
 
 Baseline/regression (скорее v1.1/v2):
 - сохранять “текущее состояние” в JSON baseline

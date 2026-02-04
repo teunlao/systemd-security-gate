@@ -3,7 +3,7 @@ package systemdanalyze
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"errors"
 	"os"
 	"os/exec"
 	"strings"
@@ -32,7 +32,7 @@ func run(ctx context.Context, exe string, args []string) (cmdResult, error) {
 	exitCode := 0
 	if err != nil {
 		var ee *exec.ExitError
-		if ok := errorAs(err, &ee); ok {
+		if errors.As(err, &ee) {
 			exitCode = ee.ExitCode()
 		} else {
 			return cmdResult{}, err
@@ -56,19 +56,4 @@ func GetVersion(systemdAnalyzePath string) (string, error) {
 	}
 	line := strings.TrimSpace(strings.Split(res.Stdout, "\n")[0])
 	return line, nil
-}
-
-// errorAs is a tiny local helper to avoid importing errors in multiple files.
-func errorAs(err error, target any) bool {
-	switch t := target.(type) {
-	case **exec.ExitError:
-		ee, ok := err.(*exec.ExitError)
-		if ok {
-			*t = ee
-			return true
-		}
-		return false
-	default:
-		panic(fmt.Sprintf("unsupported target type %T", target))
-	}
 }

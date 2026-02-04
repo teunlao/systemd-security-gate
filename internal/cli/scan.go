@@ -130,7 +130,8 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 		MatchedServices: append([]string(nil), matches...),
 	}
 
-	var hasFailure bool
+	var hasError bool
+	var hasUnallowedThreshold bool
 	for _, unit := range units {
 		unitRes := model.UnitReport{
 			UnitName:    unit.UnitName,
@@ -145,7 +146,7 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 		})
 		if err != nil {
 			unitRes.Error = err.Error()
-			hasFailure = true
+			hasError = true
 			scan.Units = append(scan.Units, unitRes)
 			continue
 		}
@@ -160,7 +161,7 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 		})
 		if err != nil {
 			unitRes.Error = err.Error()
-			hasFailure = true
+			hasError = true
 			scan.Units = append(scan.Units, unitRes)
 			continue
 		}
@@ -174,8 +175,8 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 				unitRes.Allowed = true
 			} else if allow.AllowsAllIssues(unitRes.RepoRelPath, unitRes.UnitName, allIssues) {
 				unitRes.Allowed = true
-			} else if *mode == "enforce" {
-				hasFailure = true
+			} else {
+				hasUnallowedThreshold = true
 			}
 		}
 
@@ -227,7 +228,10 @@ func runScan(args []string, stdout, stderr io.Writer) int {
 		}
 	}
 
-	if hasFailure && *mode == "enforce" {
+	if hasError {
+		return 1
+	}
+	if hasUnallowedThreshold && *mode == "enforce" {
 		return 1
 	}
 	return 0

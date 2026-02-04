@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -54,7 +55,7 @@ func SecurityOverall(systemdAnalyzePath string, args SecurityOverallArgs) (Secur
 	out := res.Stdout + "\n" + res.Stderr
 	m := overallRe.FindStringSubmatch(out)
 	if len(m) != 3 {
-		return SecurityOverallResult{}, fmt.Errorf("could not parse overall exposure from output")
+		return SecurityOverallResult{}, fmt.Errorf("could not parse overall exposure from output (exit=%d): %s", res.ExitCode, snippet(out, 800))
 	}
 
 	exposure, err := parseFloat(m[1])
@@ -103,6 +104,10 @@ func SecurityTable(systemdAnalyzePath string, args SecurityTableArgs) (SecurityT
 	if err != nil {
 		return SecurityTableResult{}, err
 	}
+	if res.ExitCode != 0 {
+		out := res.Stdout + "\n" + res.Stderr
+		return SecurityTableResult{}, fmt.Errorf("systemd-analyze security --json failed (exit=%d): %s", res.ExitCode, snippet(out, 800))
+	}
 
 	var raw []struct {
 		Set         any     `json:"set"`
@@ -112,7 +117,7 @@ func SecurityTable(systemdAnalyzePath string, args SecurityTableArgs) (SecurityT
 		Exposure    float64 `json:"exposure"`
 	}
 	if err := json.Unmarshal([]byte(res.Stdout), &raw); err != nil {
-		return SecurityTableResult{}, fmt.Errorf("parse JSON: %w", err)
+		return SecurityTableResult{}, fmt.Errorf("parse JSON: %w (output: %s)", err, snippet(res.Stdout, 800))
 	}
 
 	checks := make([]model.SecurityCheck, 0, len(raw))
@@ -160,7 +165,13 @@ func trimFloat(f float64) string {
 }
 
 func parseFloat(s string) (float64, error) {
-	var f float64
-	_, err := fmt.Sscanf(s, "%f", &f)
-	return f, err
+	return strconv.ParseFloat(s, 64)
+}
+
+func snippet(s string, max int) string {
+	s = strings.TrimSpace(s)
+	if max <= 0 || len(s) <= max {
+		return s
+	}
+	return s[:max] + "…"
 }

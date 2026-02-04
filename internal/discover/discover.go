@@ -17,6 +17,8 @@ func ServiceUnits(repoRootAbs string, includeGlobs []string, excludeGlobs []stri
 	seen := map[string]struct{}{}
 	for _, pattern := range includeGlobs {
 		pattern = strings.TrimSpace(pattern)
+		pattern = strings.TrimPrefix(pattern, "./")
+		pattern = strings.TrimPrefix(pattern, "/")
 		if pattern == "" {
 			continue
 		}
@@ -51,6 +53,8 @@ func ServiceUnits(repoRootAbs string, includeGlobs []string, excludeGlobs []stri
 func isExcluded(path string, excludeGlobs []string) bool {
 	for _, pattern := range excludeGlobs {
 		pattern = strings.TrimSpace(pattern)
+		pattern = strings.TrimPrefix(pattern, "./")
+		pattern = strings.TrimPrefix(pattern, "/")
 		if pattern == "" {
 			continue
 		}

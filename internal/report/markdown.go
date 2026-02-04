@@ -11,6 +11,9 @@ func MarkdownSummary(scan model.ScanReport) string {
 	var b strings.Builder
 	b.WriteString("## systemd security gate\n\n")
 	b.WriteString(fmt.Sprintf("- Threshold: %.2f\n", scan.Threshold))
+	if scan.Mode != "" {
+		b.WriteString(fmt.Sprintf("- Mode: %s\n", scan.Mode))
+	}
 	if scan.PolicyPath != "" {
 		b.WriteString(fmt.Sprintf("- Policy: `%s`\n", scan.PolicyPath))
 	}
@@ -46,6 +49,14 @@ func MarkdownSummary(scan model.ScanReport) string {
 
 	for _, u := range scan.Units {
 		if u.Error != "" {
+			b.WriteString(fmt.Sprintf("### %s\n\n", u.UnitName))
+			if u.RepoRelPath != "" {
+				b.WriteString(fmt.Sprintf("- Path: `%s`\n", u.RepoRelPath))
+			}
+			b.WriteString(fmt.Sprintf("- Error: %s\n\n", u.Error))
+			continue
+		}
+		if !u.ThresholdExceeded {
 			continue
 		}
 		if len(u.TopIssues) == 0 {

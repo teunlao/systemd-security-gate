@@ -42,7 +42,7 @@ Scan:
 Modes:
 
 - `--mode enforce` (default): exit non-zero if any unit fails and is not allowlisted
-- `--mode report`: never fail (adoption mode)
+- `--mode report`: never fail on threshold checks (adoption mode), but still fails on analysis errors
 
 ## Allowlist format (v1)
 
