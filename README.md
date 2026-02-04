@@ -88,7 +88,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: <owner>/systemd-security-gate@v1
+      - uses: teunlao/systemd-security-gate@v0
         with:
           paths: |
             deploy/systemd/**/*.service
@@ -106,4 +106,19 @@ jobs:
 
 ## License
 
-TBD
+MIT (see `LICENSE`).
+
+## Versioning (Action + CLI)
+
+GitHub Actions should be pinned to a tag (or SHA) instead of `main`.
+
+Recommended:
+
+- use `@v0` for “latest stable v0.x”
+- use `@v0.x.y` for fully reproducible builds
+
+Example:
+
+```yaml
+- uses: teunlao/systemd-security-gate@v0
+```

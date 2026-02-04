@@ -1,6 +1,6 @@
 name: systemd-security-gate
 description: "Fail CI when systemd service hardening regresses (systemd-analyze security, offline)"
-author: "TBD"
+author: "teunlao"
 
 inputs:
   paths:
