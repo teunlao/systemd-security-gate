@@ -55,4 +55,3 @@ runs:
     - ${{ inputs.json_report }}
     - --sarif-report
     - ${{ inputs.sarif_report }}
-

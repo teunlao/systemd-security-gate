@@ -71,7 +71,7 @@ Notes:
 
 ## GitHub Action usage (container action)
 
-This repo includes an action definition under `action/`. To use it, publish it to GitHub and reference it in workflows.
+This repo includes a container action at repo root (`action.yml` + `Dockerfile`). To use it, publish it to GitHub and reference it in workflows.
 
 Example workflow:
 
@@ -88,7 +88,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: <owner>/systemd-security-gate/action@v1
+      - uses: <owner>/systemd-security-gate@v1
         with:
           paths: |
             deploy/systemd/**/*.service

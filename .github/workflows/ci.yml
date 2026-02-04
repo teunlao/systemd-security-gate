@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: docker build
-        run: docker build -t ssg-action ./action
+        run: docker build -t ssg-action .
 
       - name: systemd-analyze version
         run: docker run --rm --entrypoint systemd-analyze ssg-action --version
@@ -71,4 +71,3 @@ jobs:
             --paths 'deploy/systemd/**/*.service' \
             --threshold 100 \
             --mode enforce
-

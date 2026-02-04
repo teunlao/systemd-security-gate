@@ -15,4 +15,3 @@ RUN apt-get update \
 COPY --from=builder /out/ssg /usr/local/bin/ssg
 WORKDIR /github/workspace
 ENTRYPOINT ["ssg"]
-
