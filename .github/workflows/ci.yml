@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Go checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: gofmt
+        run: |
+          out="$(gofmt -l .)"
+          if [ -n "$out" ]; then
+            echo "gofmt needed for:"
+            echo "$out"
+            exit 1
+          fi
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go mod tidy (check)
+        run: |
+          go mod tidy
+          git diff --exit-code go.mod go.sum
+
+      - name: go test
+        run: go test ./... -race -cover
+
+      - name: go build
+        run: go build ./cmd/ssg
+
+  action:
+    name: Action container build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: docker build
+        run: docker build -t ssg-action ./action
+
+      - name: systemd-analyze version
+        run: docker run --rm --entrypoint systemd-analyze ssg-action --version
+
+      - name: smoke scan (offline)
+        run: |
+          mkdir -p deploy/systemd
+          cat > deploy/systemd/ci-demo.service <<'EOF'
+          [Unit]
+          Description=CI demo
+
+          [Service]
+          ExecStart=/bin/true
+          EOF
+
+          docker run --rm -v "$PWD:/github/workspace" ssg-action \
+            scan \
+            --paths 'deploy/systemd/**/*.service' \
+            --threshold 100 \
+            --mode enforce
+
