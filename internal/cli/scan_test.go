@@ -244,9 +244,9 @@ if [ "${1-}" = "security" ]; then
     *" --json=short "*) 
       cat <<'JSON'
 [
-  {"set":false,"name":"PrivateNetwork=","json_field":"PrivateNetwork","description":"Service has access to the host's network","exposure":0.5},
+  {"set":false,"name":"PrivateNetwork=","json_field":"PrivateNetwork","description":"Service has access to the host's network","exposure":"0.5"},
   {"set":false,"name":"ProtectSystem=","json_field":"ProtectSystem","description":"Service has full access to the OS","exposure":0.4},
-  {"set":true,"name":"NoNewPrivileges=","json_field":"NoNewPrivileges","description":"Service cannot gain new privileges","exposure":0.0}
+  {"set":true,"name":"NoNewPrivileges=","json_field":"NoNewPrivileges","description":"Service cannot gain new privileges","exposure":null}
 ]
 JSON
       exit 0

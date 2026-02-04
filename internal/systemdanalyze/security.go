@@ -110,11 +110,11 @@ func SecurityTable(systemdAnalyzePath string, args SecurityTableArgs) (SecurityT
 	}
 
 	var raw []struct {
-		Set         any     `json:"set"`
-		Name        string  `json:"name"`
-		JSONField   string  `json:"json_field"`
-		Description string  `json:"description"`
-		Exposure    float64 `json:"exposure"`
+		Set         any             `json:"set"`
+		Name        string          `json:"name"`
+		JSONField   string          `json:"json_field"`
+		Description string          `json:"description"`
+		Exposure    flexibleFloat64 `json:"exposure"`
 	}
 	if err := json.Unmarshal([]byte(res.Stdout), &raw); err != nil {
 		return SecurityTableResult{}, fmt.Errorf("parse JSON: %w (output: %s)", err, snippet(res.Stdout, 800))
@@ -127,7 +127,7 @@ func SecurityTable(systemdAnalyzePath string, args SecurityTableArgs) (SecurityT
 			Name:        strings.TrimSpace(r.Name),
 			JSONField:   strings.TrimSpace(r.JSONField),
 			Description: strings.TrimSpace(r.Description),
-			Exposure:    r.Exposure,
+			Exposure:    float64(r.Exposure),
 		})
 	}
 
@@ -174,4 +174,35 @@ func snippet(s string, max int) string {
 		return s
 	}
 	return s[:max] + "…"
+}
+
+type flexibleFloat64 float64
+
+func (f *flexibleFloat64) UnmarshalJSON(b []byte) error {
+	if string(b) == "null" {
+		*f = 0
+		return nil
+	}
+	if len(b) > 0 && b[0] == '"' {
+		var s string
+		if err := json.Unmarshal(b, &s); err != nil {
+			return err
+		}
+		if strings.TrimSpace(s) == "" {
+			*f = 0
+			return nil
+		}
+		v, err := strconv.ParseFloat(s, 64)
+		if err != nil {
+			return err
+		}
+		*f = flexibleFloat64(v)
+		return nil
+	}
+	var v float64
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	*f = flexibleFloat64(v)
+	return nil
 }

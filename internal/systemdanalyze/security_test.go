@@ -1,6 +1,9 @@
 package systemdanalyze
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 func TestOverallRegex(t *testing.T) {
 	out := "→ Overall exposure level for myapp.service: 4.1 OK 🙂\n"
@@ -31,6 +34,38 @@ func TestCoerceBool(t *testing.T) {
 	for _, tc := range tests {
 		if got := coerceBool(tc.in); got != tc.want {
 			t.Fatalf("coerceBool(%v) = %v, want %v", tc.in, got, tc.want)
+		}
+	}
+}
+
+func TestFlexibleFloat64_UnmarshalJSON(t *testing.T) {
+	tests := []struct {
+		in      string
+		want    float64
+		wantErr bool
+	}{
+		{in: `0.25`, want: 0.25},
+		{in: `"0.25"`, want: 0.25},
+		{in: `null`, want: 0},
+		{in: `""`, want: 0},
+		{in: `"  "`, want: 0},
+		{in: `"nope"`, wantErr: true},
+	}
+
+	for _, tc := range tests {
+		var f flexibleFloat64
+		err := json.Unmarshal([]byte(tc.in), &f)
+		if tc.wantErr {
+			if err == nil {
+				t.Fatalf("json.Unmarshal(%s) error = nil, want error", tc.in)
+			}
+			continue
+		}
+		if err != nil {
+			t.Fatalf("json.Unmarshal(%s) error = %v", tc.in, err)
+		}
+		if got := float64(f); got != tc.want {
+			t.Fatalf("json.Unmarshal(%s) = %v, want %v", tc.in, got, tc.want)
 		}
 	}
 }

@@ -140,8 +140,8 @@ if [ "${1-}" = "security" ]; then
       fi
       cat <<'JSON'
 [
-  {"set":false,"name":"PrivateNetwork=","json_field":"PrivateNetwork","description":"Service has access to the host's network","exposure":0.5},
-  {"set":true,"name":"NoNewPrivileges=","json_field":"NoNewPrivileges","description":"Service cannot gain new privileges","exposure":0.0}
+  {"set":false,"name":"PrivateNetwork=","json_field":"PrivateNetwork","description":"Service has access to the host's network","exposure":"0.5"},
+  {"set":true,"name":"NoNewPrivileges=","json_field":"NoNewPrivileges","description":"Service cannot gain new privileges","exposure":null}
 ]
 JSON
       exit 0
