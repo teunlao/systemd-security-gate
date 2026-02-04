@@ -4,3 +4,5 @@
 *.sarif
 *.json
 
+# SweezLab local state (skills, mcp configs, etc.)
+.sweezlab/
