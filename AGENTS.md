@@ -1,6 +1,6 @@
 # systemd-security-gate (Project Notes for Agents)
 
-Status: scaffolding only (no implementation yet)
+Status: MVP implemented (CLI + GitHub Action scaffold)
 
 Этот документ — single source of truth: **что мы делаем, зачем, какие границы, и как реализовать без расползания**.
 Аудитория: будущие мейнтейнеры (люди + coding agents).
@@ -290,4 +290,3 @@ SARIF делаем простым:
 6) Allowlist v1 (unit + testId)
 7) SARIF writer + GitHub Action (container, pinned systemd)
 8) Интеграционные тесты в Docker + golden snapshots
-
